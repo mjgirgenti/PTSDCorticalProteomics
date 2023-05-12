@@ -7,7 +7,7 @@ The codes are run on R (version 4.2.2) within Rstudio (version 2022.12.1 Build 3
 Installation of dependencies (R packages) may take up to a few hours depending on how many of them have been installed (most of them are commonly used R packages and can be found on R CRAN or Bioconductor).
 
 ## Demo
-The R codes are designed for analyzing processed proteomics and miRNA data as inlcuded in `data` folder. Each R script is responsible for one or a few different tasks of analysis.
+The R scripts are within the `script` folder. They are designed for analyzing processed proteomics and miRNA data as inlcuded in `data` folder. Each R script is responsible for one or a few different tasks of analysis.
 The expected output of `Proteomics_analysis.R` should be processed proteomics data, results of proteomics differential expression, WGCNA analysis and some other necessary analyses.
 The expected output of `Proteomics_KDA_analysis.R` should be results of proteomics KDA analysis.
 The expected output of `miRNA_analysis.R` should be processed miRNA data, results of miRNA differential expression, WGCNA and some other necessary analyses as well as those of enrichment analysis between proteomics and miRNA.
