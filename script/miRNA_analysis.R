@@ -40,7 +40,7 @@ STAR --genomeDir $genomeDir --readFilesIn RTMIR040_033_CAGGCG_L001_R1_001.fastq 
 ### read in miRNA-seq reads ####
 library(stringr)
 rm(list=ls())
-# dat <- read.table('rawdata/newcounts_all1.5.txt', header=T) ## mapping trial1.4; counting 1.5; -t exon -g transcript_id -s 1 -O
+# dat <- read.table('../data/newcounts_all1.5.txt', header=T) ## mapping trial1.4; counting 1.5; -t exon -g transcript_id -s 1 -O
 
 datProbes <- dat[1:6]
 datProbes$chr <- datProbes$Chr %>% as.character %>% strsplit(split=";") %>% sapply("[",1)
@@ -57,7 +57,7 @@ datMeta <- data.frame(Sample0=samples0,
 # PrimaryDx=str_extract(samples, pattern="[C,M,P]"),
 # Region=str_extract(samples, pattern="[C,M,P][0-9]+") %>% gsub("C|M|P","",.))
 
-# log <- read.table('rawdata/log_summary_all1.5.txt', header=T) %>% t()
+# log <- read.table('../data/log_summary_all1.5.txt', header=T) %>% t()
 
 colnames(log) <- log[1,] %>% as.character
 log <- log[-1,] %>% as.data.frame
@@ -77,18 +77,18 @@ gene0 <- rowSums(datExpr)>0 & datProbes$chr %in% c(1:22, "X","Y","MT")
 datExpr <- datExpr[gene0,]; datProbes <- datProbes[gene0,]
 datProbes$chr <- factor(datProbes$chr)
 dim(datExpr)
-# save(datExpr, datMeta, datProbes, log, file="rawdata/dat_upmc_mirna_map1.5.RData")
+# save(datExpr, datMeta, datProbes, log, file="../data/dat_upmc_mirna_map1.5.RData")
 
 
-# ref <- xlsx::read.xlsx('rawdata/Copy of RQ14148-summary.xlsx', sheetIndex=1)
+# ref <- xlsx::read.xlsx('../data/Copy of RQ14148-summary.xlsx', sheetIndex=1)
 # ref$BA <- rep(c(25,9), each=66)
 # ref$label.dx <- str_extract(ref$NA., pattern="[C,M,P]")
 # ref$Br.[ref$Br.==1988] <- 1488
 # ref$Br.[ref$Br.==1912] <- 1412
 # ref$Br.[ref$Br.==1204] <- 1201
 # ref$label <- paste0(ref$Br.,"U",ref$label.dx,ref$BA)
-# save(ref, file="rawdata/reference_mirna.RData")
-load('rawdata/reference_mirna.RData')
+# save(ref, file="../data/reference_mirna.RData")
+load('../data/reference_mirna.RData')
 datMeta$BrNum <- ref$Br.[match(datMeta$Sample,ref$Sample.ID)]
 datMeta$Dx <- ref$NA.[match(datMeta$Sample,ref$Sample.ID)]
 datMeta$Sample.bulk <- ref$label[match(datMeta$Sample,ref$Sample.ID)]
@@ -124,13 +124,13 @@ datProbes0$Genename <- probes$external_gene_name[match(datProbes0$Geneid, probes
 datProbes0$Biotype <- probes$gene_biotype[match(datProbes0$Geneid, probes$ensembl_gene_id)]
 datProbes <- datProbes0
 
-save(datExpr, datProbes, datMeta, log, file="rawdata/dat_upmc_mirna_t0m1.4.RData")
+save(datExpr, datProbes, datMeta, log, file="../data/dat_upmc_mirna_t0m1.4.RData")
 
 ### DE miRNA analysis ####
 rm(list=ls())
-# load('rawdata/dat_upmc_mirna_trial4_etO.RData')
-# load('rawdata/dat_upmc_mirna_map1.5.RData')
-load('rawdata/dat_upmc_mirna_all1.5.RData')
+# load('../data/dat_upmc_mirna_trial4_etO.RData')
+# load('../data/dat_upmc_mirna_map1.5.RData')
+load('../data/dat_upmc_mirna_all1.5.RData')
 datMeta$region <- factor(datMeta$region)
 gene.mir <- datProbes$TranscriptType == "miRNA"
 datExpr <- datExpr[gene.mir,]
@@ -200,8 +200,8 @@ for (i in 1:length(indices)){
       sig02 <- dsort
     } else sig12 <- dsort
   }
-  # fname <- paste0("result_mirna/deseq_", files[i], "_m3_ulval_transcript_lncproc.RData")
-  fname <- paste0("result_mirna/deseq_", files[i], "_m3_upmc_mirna_all1.5.RData")
+  # fname <- paste0("../results/deseq_", files[i], "_m3_ulval_transcript_lncproc.RData")
+  fname <- paste0("../results/deseq_", files[i], "_m3_upmc_mirna_all1.5.RData")
   save(sig01, sig02, sig12, file=fname)
 }
 
@@ -210,10 +210,10 @@ rm(list=ls())
 # labs <- paste0(rep(c('A','F','M'),each=4),c(9,11,24,25))
 labs <- paste0(rep(c('A','F','M'),each=2),c(9,25))
 for (lab in labs){
-  # file <- paste0('result_upmc/deseq_',lab,'_m4_re.RData')
-  # file <- paste0('result_mirna/deseq_',lab,'_m3_upmc_mirna_etO.RData')
-  # file <- paste0('result_mirna/deseq_',lab,'_m3_upmc_mirna_map1.5.RData')
-  file <- paste0('result_mirna/deseq_',lab,'_m3_upmc_mirna_all1.5.RData')
+  # file <- paste0('../results/deseq_',lab,'_m4_re.RData')
+  # file <- paste0('../results/deseq_',lab,'_m3_upmc_mirna_etO.RData')
+  # file <- paste0('../results/deseq_',lab,'_m3_upmc_mirna_map1.5.RData')
+  file <- paste0('../results/deseq_',lab,'_m3_upmc_mirna_all1.5.RData')
   if (file.exists(file)){
     load(file)
     lab %>% print
@@ -225,18 +225,18 @@ for (lab in labs){
   }
 }
 
-load('result_mirna/deseq_A9_m3_upmc_mirna_etO.RData')
-load('rawdata/hsa_probes.RData')
+load('../results/deseq_A9_m3_upmc_mirna_etO.RData')
+load('../data/hsa_probes.RData')
 sig02$Name <- hsa_gtf$gene_name[match(sig02$Transcriptid %>% as.character,hsa_gtf$transcript_id)]
 sig02$Name2 <- hsa_gtf$gene_name[match(sig02$Geneid,hsa_gtf$gene_id)]
 View(sig02)
 
 ### comparing between dlPFC and sgPFC, MDD and PTSD, FvsM ####
 rm(list=ls())
-# load('result_mirna/deseq_A9_m3_upmc_mirna_map1.5.RData')
-load('result_mirna/deseq_A9_m3_upmc_mirna_all1.5.RData')
+# load('../results/deseq_A9_m3_upmc_mirna_map1.5.RData')
+load('../results/deseq_A9_m3_upmc_mirna_all1.5.RData')
 sig01.d <- sig01; sig02.d <- sig02
-load('result_mirna/deseq_A25_m3_upmc_mirna_map1.5.RData')
+load('../results/deseq_A25_m3_upmc_mirna_map1.5.RData')
 sig01.s <- sig01; sig02.s <- sig02
 
 ## comparing brain regions
@@ -281,11 +281,11 @@ abline(lm.02$coefficients[,1], col="red", lty=2)
 
 ## comparing sex overlap
 rm(list=ls())
-# load('result_mirna/deseq_F25_m3_upmc_mirna_map1.5.RData')
-load('result_mirna/deseq_F9_m3_upmc_mirna_all1.5.RData')
+# load('../results/deseq_F25_m3_upmc_mirna_map1.5.RData')
+load('../results/deseq_F9_m3_upmc_mirna_all1.5.RData')
 sig01.d <- sig01; sig02.d <- sig02
-# load('result_mirna/deseq_M25_m3_upmc_mirna_map1.5.RData')
-load('result_mirna/deseq_M9_m3_upmc_mirna_all1.5.RData')
+# load('../results/deseq_M25_m3_upmc_mirna_map1.5.RData')
+load('../results/deseq_M9_m3_upmc_mirna_all1.5.RData')
 sig01.s <- sig01; sig02.s <- sig02
 sig01 <- merge(sig01.d, sig01.s, by="Geneid")
 sig01 <- sig01[sig01$Chr.x!="X" & !is.na(sig01$padj.x) & !is.na(sig01$padj.y),]
@@ -325,9 +325,9 @@ getFKPM <- function(dat, log2=TRUE, minute=1e-3, trim=5, suffix=TRUE, lengths=NU
 # load('../data/ulval_re.RData') ## miRNA data from bulk RNAseq with Ensembl reference feature exon
 # sel.sam <- datMeta$region=='dlPFC'
 # sel.gene <- which(datProbes$gene_biotype=="miRNA")
-# load('rawdata/ulval_re_mi_map2.RData') ## miRNA data from bulk RNAseq with MirBase reference
-# load('rawdata/dat_upmc_mirna_map1.5.RData')
-load('rawdata/dat_upmc_mirna_all1.5.RData')
+# load('../data/ulval_re_mi_map2.RData') ## miRNA data from bulk RNAseq with MirBase reference
+# load('../data/dat_upmc_mirna_map1.5.RData')
+load('../data/dat_upmc_mirna_all1.5.RData')
 
 # ## normalization on selected miRNAs (option 1)
 # sel.sam <- datMeta$region=="dlPFC"
@@ -356,7 +356,7 @@ sel <- datMeta.t$PrimaryDx != "MDD"
 datFPKM.t <- datFPKM.t[,sel]; datMeta.t <- datMeta.t[sel,]
 
 ### proteins
-load('DIA_new.RData')
+load('../data/DIA_new.RData')
 datExpr.p <- datExpr; datMeta.p <- datMeta; datProbes.p <- datProbes
 sel.sam <- datMeta.p$Region=='dlPFC'
 datExpr.p <- datExpr.p[,sel.sam]; datMeta.p <- datMeta.p[sel.sam,]
@@ -370,7 +370,7 @@ df$pvalue <- sapply(colnames(cors), function(g2){
   sapply(1:nrow(cors), function(g1){cor.test(datFPKM.t1[g1,],datExpr.p[g2,])$p.value})}) %>% melt %>% .$value
 # df$padj <- p.adjust(df$pvalue, method="fdr")
 # sum(df$padj<.05)
-# load('rawdata/hsa_probes.RData')
+# load('../data/hsa_probes.RData')
 # df$Name <- hsa_mirbase$Name[match(df$Var1,hsa_mirbase$Alias)]
 # df[df$Var1=="MIR128-1",] %>% .[order(abs(.$value), decreasing = T),] %>% View
 # df[df$Var2=="VIAAT",] %>% .[order(abs(.$value), decreasing = T),] %>% View
@@ -378,12 +378,12 @@ df$pvalue <- sapply(colnames(cors), function(g2){
 # df[df$padj<.05,] %>% View
 # df$Var2[df$padj<.05] %>% factor %>% table %>% sort(decreasing=T)
 # df_sig <- df[df$pvalue<.05,]
-# save(df_sig, file="result_mirna/cor_prot_dlpfc_sig.RData")
+# save(df_sig, file="../results/cor_prot_dlpfc_sig.RData")
 
 ## combine with protein results
 df$miRNA <- datProbes.t$Genename[match(df$Var1,datProbes.t$Geneid)]
-load('result_mirna/deseq_A9_m3_upmc_mirna_all1.5.RData')
-# load('result_mirna/deseq_A25_m3_upmc_mirna_map1.5.RData')
+load('../results/deseq_A9_m3_upmc_mirna_all1.5.RData')
+# load('../results/deseq_A25_m3_upmc_mirna_map1.5.RData')
 df$PTSD.padj <- sig02$padj[match(df$Var1, sig02$Geneid)]
 df$PTSD.pvalue <- sig02$pvalue[match(df$Var1, sig02$Geneid)]
 df$MDD.padj <- sig01$padj[match(df$Var1, sig01$Geneid)]
@@ -418,7 +418,7 @@ for (area in c("9","11","24","25")){
 df <- data.frame(BA=c(9,11,24,25),MDD=c(367,3134,83,4065),PTSD=c(393,170,74,1), overlap=c(111,67,14,0))
 df$percent.mdd <- (df$overlap/df$MDD * 100) %>% round(digits=3)
 df$percent.ptsd <- (df$overlap/df$PTSD * 100) %>% round(digits=3)
-write.csv(df, file="results/pc&degs/summary_mdd_ptsd.csv")
+write.csv(df, file="../results/pc&degs/summary_mdd_ptsd.csv")
 
 
 
@@ -445,7 +445,7 @@ library(stringr)
 # options(stringsAsFactors = FALSE, digits = 3)
 # theme_update(plot.title = element_text(hjust = 0.5))
 rm(list=ls())
-load('rawdata/dat_upmc_mirna_all1.5.RData')
+load('../data/dat_upmc_mirna_all1.5.RData')
 getFKPM <- function(dat, log2=TRUE, minute=1e-3, trim=5, scale=1e6, suffix=TRUE, datLen){
   sel <- (trim+1):dim(dat)[2]
   seldat <- dat[,sel]
@@ -545,7 +545,7 @@ net <- blockwiseModules(datExpr = dat, power = power,
                         saveTOMs = F, 
                         saveTOMFileBase = "catTOM",
                         verbose = 3)
-# pdf('result_0703//wgcna_dendrogram_amp_ca.pdf', width=12)
+# pdf('../results//wgcna_dendrogram_amp_ca.pdf', width=12)
 plotDendroAndColors(net$dendrograms[[1]], net$colors[net$blockGenes[[1]]],
                     main = "Single block gene dendrogram and module colors",
                     dendroLabels = FALSE, hang = 0.03,
@@ -577,9 +577,9 @@ moduleTraitPvalue = corPvalueStudent(moduleTraitCor, nSamples);
 textMatrix = paste(signif(moduleTraitCor, 2), "\n(",
                    signif(moduleTraitPvalue, 1), ")", sep = "");
 dim(textMatrix) = dim(moduleTraitCor)
-# pdf('result_0703/wgcna_traitcor_dl_cp.pdf')
-# pdf('result_0703/wgcna_traitcor_dl_cm.pdf')
-# pdf('result_0703/wgcna_traitcor_sg_cp.pdf')
+# pdf('../results/wgcna_traitcor_dl_cp.pdf')
+# pdf('../results/wgcna_traitcor_dl_cm.pdf')
+# pdf('../results/wgcna_traitcor_sg_cp.pdf')
 par(mar = c(5, 5, 3, 3));
 labeledHeatmap(Matrix = moduleTraitCor,
                xLabels = names(datMeta1),
@@ -615,7 +615,7 @@ all$DxmoduleMembership <- mm
 
 ## save
 save(all, datFPKM, datExpr2, datProbes2, datMeta, MEs, moduleTraitCor, moduleTraitPvalue,
-     file = "result_2022/WGCNA_CP_ds_combatBatch.RData")
+     file = "../results/WGCNA_CP_ds_combatBatch.RData")
 
 ## follow up
 lm.gs <- summary(lm(data=subset(all,module==1), trait.GS.PTSD ~ DxmoduleMembership))

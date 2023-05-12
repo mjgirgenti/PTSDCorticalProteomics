@@ -41,10 +41,10 @@ datExpr <- dat[-(1:ntrim)]
 save(datExpr, datProbes, datMeta, file="DIA_new0.RData")
 
 ## find matched information
-# load("DIA_new.RData")
+# load("../data/DIA_new.RData")
 datExpr1 <- datExpr; 
 datMeta1 <- datMeta; datProbes1 <- datProbes
-load("DIA_dl_sgPFC.RData")
+load("../data/DIA_dl_sgPFC.RData")
 label <- datMeta$Sample.raw
 label <- gsub("_Girgenti|_DIA|.mzML","",label)
 label <- gsub("OTF18-","sgPFC_",label)
@@ -60,7 +60,7 @@ save(datExpr, datProbes, datMeta, file="DIA_new.RData")
 
 ### data inspection ====
 rm(list=ls())
-load('DIA_new.RData')
+load('../data/DIA_new.RData')
 datExpr <- datExpr %>% apply(., 2, function(x) x %>% as.character %>% as.numeric)
 sum(is.na(apply(datExpr,1,sum))); sum(is.na(datExpr))
 sel.rm <- is.na(apply(datExpr,1,sum))
@@ -69,7 +69,7 @@ datExpr <- datExpr[!sel.rm,]; datProbes <- datProbes[!sel.rm,]
 var.sel <- apply(datExpr,1,sd) %>% order(decreasing = T)
 # colnames(datExpr) <- paste0(colnames(datExpr), "_", datMeta$Region)
 
-pdf('result_0518/result_dist.pdf')
+pdf('../results/result_dist.pdf')
 heatmap(datEpr[var.sel[1:1000],], main="Heatmap of top 1k most variated proteins")
 plot(density(rowMeans(datExpr)), main="Distribution of mean expression levels")
 lines(density(rowMeans(datExpr[,datMeta$Region=="dlPFC"])), col="red")
@@ -85,7 +85,7 @@ pca.tpm <- prcomp(t(datExpr), scale. = T, center = T)
 pcatpm <- pca.tpm$x
 pcatsne <- tsne::tsne(pcatpm[,1:10])
 
-pdf('result_0518/result_dimred.pdf', width=10)
+pdf('../results/result_dimred.pdf', width=10)
 par(mfrow=c(2,3))
 plot(pcatpm[,1:2], main="PCA of samples", pch=16, col=factor(datMeta$Region))
 legend('topleft', levels(factor(datMeta$Region)), pch=16, col=1:2, cex=.5)
@@ -116,7 +116,7 @@ plot(pcatsne, col=factor(datMeta$BrNum), pch=16, main="tSNE of samples")
 legend('topleft', levels(factor(datMeta$BrNum)), pch=16, col=1:57, cex=.5)
 dev.off()
 
-pdf('result_0518/result_hclust.pdf', width=12, height=8)
+pdf('../results/result_hclust.pdf', width=12, height=8)
 d <- dist(t(datExpr[var.sel,]), method = "euclidean")
 hc1 <- hclust(d, method = "average")
 plot(hc1, cex = 0.4, hang = -1, main="All proteins")
@@ -148,7 +148,7 @@ heatmap.2(abs(corrs), dendrogram = 'none', trace="none", Rowv = NULL, Colv=NULL,
 dev.off()
 
 ### differential expression analysis ====
-load('DIA_new.RData')
+load('../data/DIA_new.RData')
 datExpr <- datExpr %>% apply(., 2, function(x) x %>% as.character %>% as.numeric)
 sum(is.na(apply(datExpr,1,sum))); sum(is.na(datExpr))
 sel.rm <- is.na(apply(datExpr,1,sum))
@@ -174,7 +174,7 @@ prot1 = do.call("cbind", sumstats)
 prot1$PN <- datProbes$PN; prot1$GN <- datProbes$GN; prot1$EN<- datProbes$EN
 View(prot1)
 sum(prot1$MDD.adj.P.Val<.05); sum(prot1$PTSD.adj.P.Val<.05)
-write.csv(file="result_0518/DE_MDD_PTSD_dl.csv", prot1)
+write.csv(file="../results/DE_MDD_PTSD_dl.csv", prot1)
 
 
 ## ComBat corrected
@@ -187,7 +187,7 @@ sumstats$PTSD = topTable(fit, coef=3, number = Inf, sort.by = "none", confint = 
 prot1 = do.call("cbind", sumstats)
 prot1$PN <- datProbes$PN; prot1$GN <- datProbes$GN; prot1$EN<- datProbes$EN
 View(prot1)
-write.csv(file="result_0518/DE_MDD_PTSD_combat.csv", prot1)
+write.csv(file="../results/DE_MDD_PTSD_combat.csv", prot1)
 
 
 ### WGCNA ====
@@ -216,8 +216,8 @@ rm(list=ls())
 # new: not adjusted for covariates
 
 ## load & prepare data
-# load('DIA_dl_sgPFC.RData')
-load('DIA_new.RData')
+# load('../data/DIA_dl_sgPFC.RData')
+load('../data/DIA_new.RData')
 
 # ## select invariant proteins
 # datExpr0 <- datExpr; datExpr <- datExpr[inv.sel,]
@@ -238,7 +238,7 @@ datExpr <- datExpr[,sam1]
 datMeta <- datMeta[sam1,]
 
 ##combined
-# load('DIA_dl_sgPFC.RData') 
+# load('../data/DIA_dl_sgPFC.RData') 
 # sel0 <- !is.na(datProbes$GN)
 # datExpr <- datExpr[sel0,]
 # datProbes <- datProbes[sel0,]
@@ -296,7 +296,7 @@ net <- blockwiseModules(datExpr = dat, power = power,
                         saveTOMs = F, 
                         saveTOMFileBase = "catTOM",
                         verbose = 3)
-# pdf('result_0703//wgcna_dendrogram_amp_ca.pdf', width=12)
+# pdf('../results/wgcna_dendrogram_amp_ca.pdf', width=12)
 plotDendroAndColors(net$dendrograms[[1]], net$colors[net$blockGenes[[1]]],
                     main = "Single block gene dendrogram and module colors",
                     dendroLabels = FALSE, hang = 0.03,
@@ -323,9 +323,9 @@ moduleTraitPvalue = corPvalueStudent(moduleTraitCor, nSamples);
 textMatrix = paste(signif(moduleTraitCor, 2), " (",
                    signif(moduleTraitPvalue, 1), ")", sep = "");
 dim(textMatrix) = dim(moduleTraitCor)
-# pdf('result_0703/wgcna_traitcor_dl_cp.pdf')
-# pdf('result_0703/wgcna_traitcor_dl_cm.pdf')
-pdf('result_0703/wgcna_traitcor_sg_cp.pdf')
+# pdf('../results/wgcna_traitcor_dl_cp.pdf')
+# pdf('../results/wgcna_traitcor_dl_cm.pdf')
+pdf('../results/wgcna_traitcor_sg_cp.pdf')
 par(mar = c(5, 10, 3, 3));
 labeledHeatmap(Matrix = moduleTraitCor,
                xLabels = names(datMeta1),
@@ -358,9 +358,9 @@ mm <- sapply(1:dim(all)[1], function(x){geneModuleMembership[x, match(moduleColo
 all$DxmoduleMembership <- mm
 
 ##save
-# filesave = "result_0703//WGCNA_CP_dl.RData"
-# filesave =  "result_0703/WGCNA_CM_dl.RData"
-# filesave = "result_0703/WGCNA_CM_sg.RData"
+# filesave = "../results//WGCNA_CP_dl.RData"
+# filesave =  "../results/WGCNA_CM_dl.RData"
+# filesave = "../results/WGCNA_CM_sg.RData"
 # save(dat, datProbes, datMeta, all, moduleTraitCor, moduleTraitPvalue, MEs, textMatrix, 
 #      file=filesave)
 
@@ -395,7 +395,7 @@ dendro.row= as.dendrogram(hclust(as.dist(1-bicor(MEs[modSig])), method="average"
 
 library(gplots)
 library(WGCNA)
-pdf('result_0703/wgcna_csea_sg_cp.pdf')
+pdf('../results/wgcna_csea_sg_cp.pdf')
 heatmap.2(-log10(to_plot+10^(-100)),
           col=blueWhiteRed(1000,1)[500:1000],
           scale="none",
@@ -421,18 +421,18 @@ heatmap.2(-log10(to_plot+10^(-100)),
 dev.off()
 
 ##save
-# filesave = "result_0703/WGCNA_DIA_dl_cp.RData"
-# filesave = 'result_0703/WGCNA_CM_dl.RData'
-filesave = 'result_0703/WGCNA_CP_sg.RData'
+# filesave = "../results/WGCNA_DIA_dl_cp.RData"
+# filesave = '../results/WGCNA_CM_dl.RData'
+filesave = '../results/WGCNA_CP_sg.RData'
 save(dat, datProbes, datMeta, all, to_plot, dendro.row, dendro.col, moduleTraitCor, moduleTraitPvalue, MEs, textMatrix, 
      file=filesave)
 
 
 ### write out genes for GO ====
 ## dl: cyan, yellow, salmon
-load('result_0518/WGCNA_DIA_dl.RData')
+load('../results/WGCNA_DIA_dl.RData')
 genes <- all$Geneid[all$module=="salmon"]
-write(genes %>% as.character, file = "result_0518/mod_salmon_dl.txt")
+write(genes %>% as.character, file = "../results/mod_salmon_dl.txt")
 
 ### WGCNA on combined dlPFC and sgPFC, CP/CM ====
 library(magrittr)
@@ -453,7 +453,7 @@ library(gplots)
 options(stringsAsFactors = FALSE, digits = 3)
 
 rm(list=ls())
-load('DIA_new.RData')
+load('../data/DIA_new.RData')
 dat <- datExpr %>% t()
 gene.sel2 <- colSums(is.na(dat))==0
 dat <- dat[,gene.sel2]
@@ -563,8 +563,8 @@ all <- cbind(all, traitSignificance=geneTraitSignificance)
 mm <- sapply(1:dim(all)[1], function(x){geneModuleMembership[x, match(moduleColors[x], modNames)]})
 all$DxmoduleMembership <- mm
 
-save(all, moduleTraitCor, moduleTraitPvalue, dat, datMeta, file="result_0703/WGCNA_CM_dlsg.RData")
-pdf('result_0703/wgcna_traitcor_cm_dlsg.pdf')
+save(all, moduleTraitCor, moduleTraitPvalue, dat, datMeta, file="../results/WGCNA_CM_dlsg.RData")
+pdf('../results/wgcna_traitcor_cm_dlsg.pdf')
 par(mar = c(5, 10, 3, 3));
 labeledHeatmap(Matrix = moduleTraitCor,
                xLabels = names(datMeta1),
@@ -584,9 +584,9 @@ dev.off()
 library(ggplot2)
 library(dplyr)
 rm(list=ls())
-load('result_0703/WGCNA_CP_dlsg.RData')
+load('../results/WGCNA_CP_dlsg.RData')
 all.p <- all
-load('result_0703/WGCNA_CM_dlsg.RData')
+load('../results/WGCNA_CM_dlsg.RData')
 all.t <- all
 
 all <- merge(all.p[2:3], all.t[2:3], by="Genename")
@@ -604,7 +604,7 @@ ggplot(df, aes(module.protein, module.RNA, fill=log1p(Freq))) +
   scale_fill_gradient(low="white", high="red") +
   theme_classic()
 
-pdf('result_0703/wgcna_module_cp_cm_dlsg.pdf', width=8, height=6)
+pdf('../results/wgcna_module_cp_cm_dlsg.pdf', width=8, height=6)
 ggplot(df[!(df$module.protein=="grey"|df$module.RNA=="grey"),], 
        aes(module.protein, module.RNA, fill=ES)) + 
   geom_tile() +
@@ -615,9 +615,9 @@ dev.off()
 
 ### comparing RNA/protein expression: select the same individuals ====
 rm(list=ls())
-load('result_upmc/dat_upmc_qnorm_CMP.RData')
+load('../results/dat_upmc_qnorm_CMP.RData')
 datExpr.t <- datExpr; datMeta.t <- datMeta; datProbes.t <- datProbes
-load('DIA_new.RData')
+load('../data/DIA_new.RData')
 
 datExpr <- as.data.frame(datExpr)
 sel_sam <- which(datMeta.t$Region==9)
@@ -702,9 +702,9 @@ heatmap(cor(t(dat31) %>% as.matrix))
 
 ### comparing RNA/protein expression: corresponding UPMC samples only ====
 rm(list=ls())
-load('proteomics/DIA_new.RData')
+load('../data/DIA_new.RData')
 datExpr.p <- datExpr; datMeta.p <- datMeta; datProbes.p <- datProbes
-load('data/dat13_ulval_keep3.RData')
+load('../data/dat13_ulval_keep3.RData')
 sel <- meta13uv_keep$BrNum %in% (datMeta$BrNum[datMeta$Region=="dlPFC"] ) 
 datExpr.t <- dat13uv_keep[,6+which(sel)]
 datMeta.t <- meta13uv_keep[sel,]
@@ -713,7 +713,7 @@ save(datExpr.t, datMeta.t, suff_keep, fpkm.t, file="data/RNA_upmc_prot_dl.RData"
 
 ### DESeq2 with the 52 UPMC samples ====
 rm(list=ls())
-load('RNA_upmc_prot_dl.RData')
+load('../data/RNA_upmc_prot_dl.RData')
 
 library(DESeq2)
 cntdat <- datExpr.t
@@ -778,14 +778,14 @@ for (i in 1:length(indices)){
       sig02 <- dsort
     } else sig12 <- dsort
   }
-  fname <- paste0("result_upmc/deseq_", files[i], "_m4_keep3.RData")
+  fname <- paste0("../results/deseq_", files[i], "_m4_keep3.RData")
   save(sig01, sig02, sig12, file=fname)
 }
 
 ### utmost results for multiple traits ####
 rm(list=ls())
 ## read all utmost
-ad <- read.table('result_gwas/merged_test_results_MDD.txt', header=T)
+ad <- read.table('../results/merged_test_results_MDD.txt', header=T)
 ad <- ad[!is.na(ad$test_score),]
 ad <- ad[order(ad$p_value),]; ad_sig <- ad[1:100,] ## only the top 100
 # ad$p_adj <- p.adjust(ad$p_value, method="bonferroni")
@@ -793,7 +793,7 @@ ad <- ad[order(ad$p_value),]; ad_sig <- ad[1:100,] ## only the top 100
 # ad_sig <- ad[ad$p_adj<.05,]
 # ad_sig <- ad_sig[order(ad_sig$p_value),]
 mdd <- ad_sig
-ad <- read.table('result_gwas/merged_test_results_SCZ.txt', header=T)
+ad <- read.table('../results/merged_test_results_SCZ.txt', header=T)
 ad <- ad[!is.na(ad$test_score),]
 ad <- ad[order(ad$p_value),]; ad_sig <- ad[1:100,] ## only the top 100
 # ad$p_adj <- p.adjust(ad$p_value, method="bonferroni")
@@ -801,7 +801,7 @@ ad <- ad[order(ad$p_value),]; ad_sig <- ad[1:100,] ## only the top 100
 # ad_sig <- ad[ad$p_adj<.05,]
 # ad_sig <- ad_sig[order(ad_sig$p_value),]
 scz <- ad_sig
-ad <- read.table('result_gwas/merged_test_results_BD.txt', header=T)
+ad <- read.table('../results/merged_test_results_BD.txt', header=T)
 ad <- ad[!is.na(ad$test_score),]
 ad <- ad[order(ad$p_value),]; ad_sig <- ad[1:100,] ## only the top 100
 # ad$p_adj <- p.adjust(ad$p_value, method="bonferroni")
@@ -819,21 +819,21 @@ ad <- ad[order(ad$p_value),]; ad_sig <- ad[1:100,] ## only the top 100
 psd <- ad_sig
 
 ## put them together
-azd <- read.table('result_gwas/merged_test_results_AD.txt', header=T)
+azd <- read.table('../results/merged_test_results_AD.txt', header=T)
 azd <- azd[!is.na(azd$test_score),]
 azd <- azd[order(azd$p_value),]; #ad_sig <- ad[1:100,] ## only the top 100
 azd$p_adj <- p.adjust(azd$p_value, method="bonferroni")
-ad <- read.table('result_gwas/merged_test_results_MDD.txt', header=T)
+ad <- read.table('../results/merged_test_results_MDD.txt', header=T)
 ad <- ad[!is.na(ad$test_score),]
 ad <- ad[order(ad$p_value),]; #ad_sig <- ad[1:100,] ## only the top 100
 ad$p_adj <- p.adjust(ad$p_value, method="bonferroni")
 mdd <- ad
-ad <- read.table('result_gwas/merged_test_results_SCZ.txt', header=T)
+ad <- read.table('../results/merged_test_results_SCZ.txt', header=T)
 ad <- ad[!is.na(ad$test_score),]
 ad <- ad[order(ad$p_value),]; #ad_sig <- ad[1:100,] ## only the top 100
 ad$p_adj <- p.adjust(ad$p_value, method="bonferroni")
 scz <- ad
-ad <- read.table('result_gwas/merged_test_results_BD.txt', header=T)
+ad <- read.table('../results/merged_test_results_BD.txt', header=T)
 ad <- ad[!is.na(ad$test_score),]
 ad <- ad[order(ad$p_value),]; #ad_sig <- ad[1:100,] ## only the top 100
 ad$p_adj <- p.adjust(ad$p_value, method="bonferroni")
@@ -843,11 +843,11 @@ ad <- ad[!is.na(ad$test_score),]
 ad <- ad[order(ad$p_value),]; #ad_sig <- ad[1:100,] ## only the top 100
 ad$p_adj <- p.adjust(ad$p_value, method="bonferroni")
 psd <- ad
-ad <- read.table('result_gwas/merged_test_results_ASD.txt', header=T)
+ad <- read.table('../results/merged_test_results_ASD.txt', header=T)
 ad <- ad[!is.na(ad$test_score),]
 ad <- ad[order(ad$p_value),]; #ad_sig <- ad[1:100,] ## only the top 100
 ad$p_adj <- p.adjust(ad$p_value, method="bonferroni")
 asd <- ad
-save(asd, azd, mdd, psd, scz, bpd, file="utmost_6traits.RData")
+save(asd, azd, mdd, psd, scz, bpd, file="results/utmost_6traits.RData")
 
 ####### END ##############

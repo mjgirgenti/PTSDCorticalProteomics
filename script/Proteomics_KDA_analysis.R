@@ -21,10 +21,10 @@ library('ggplotify')
 rm(list=ls())
 # args <- c("~/Documents/Projects/PTSD/proteomics/DIA_new.RData", ## DATA FILE
 #           "~/Documents/Projects/PTSD/proteomics/",  ## DEG_FILE_PATH
-#           "result_0518/DE_MDD_PTSD_dl.csv",  ## DEG_FILE_PATTERN
+#           "../results/DE_MDD_PTSD_dl.csv",  ## DEG_FILE_PATTERN
 #           "~/Documents/Projects/PTSD/proteomics/",  ## WGCNA_FILE_PATH
-#           "result_0703/WGCNA_CP_dl.RData",  ## WGCNA_FILE_PATTERN
-#           "result_0128/",  ## OUTPUT_FILE_PATH
+#           "../results/WGCNA_CP_dl.RData",  ## WGCNA_FILE_PATTERN
+#           "../results/",  ## OUTPUT_FILE_PATH
 #           "0208") ## OUTFILE_SUFFIX
 # Figures_path <- args[6]
 # outfile_suffix <- args[7]
@@ -32,12 +32,12 @@ rm(list=ls())
 ### parameteres needed
 ## degs to all0102
 # load('DIA_new.RData')
-load('DIA_new1.RData')
+load('../data/DIA_new1.RData')
 fpkmdat <- as.data.frame(datExpr)
 demos <- datMeta
 fpkmdat$Genename <- datProbes$GN
-# dep <- read.csv('result_0518/DE_MDD_PTSD_dl.csv')
-dep <- read.csv('result_0518/DE_MDD_PTSD_dl_incA_new1.csv')
+# dep <- read.csv('../results/DE_MDD_PTSD_dl.csv')
+dep <- read.csv('../results/DE_MDD_PTSD_dl_incA_new1.csv')
 thres_padj <- 0.05 ## args[8]
 all0102 <- data.frame(Geneid = dep$GN, 
                       MDD.A9 = as.numeric(dep$MDD.P.Value < thres_padj) * sign(dep$MDD.logFC),
@@ -47,18 +47,18 @@ group <- "A9"
 
 
 ## enrichment of DEPs
-# sig.p <- read.csv('result_0518/DE_MDD_PTSD_dl.csv')
-sig.p <- read.csv('result_0518/DE_MDD_PTSD_dl_incA_new1.csv')
+# sig.p <- read.csv('../results/DE_MDD_PTSD_dl.csv')
+sig.p <- read.csv('../results/DE_MDD_PTSD_dl_incA_new1.csv')
 dep.m <- sig.p$GN[sig.p$MDD.P.Value<.05]
 dep.p <- sig.p$GN[sig.p$PTSD.P.Value<.05]
 
-# sig.p <- read.csv('result_0128/DE_PvCM_dlsg.csv')
+# sig.p <- read.csv('../results/DE_PvCM_dlsg.csv')
 # dep.m <- sig.p$GN[sig.p$dlPFC.P.Value<.05]
 # dep.p <- sig.p$GN[sig.p$sgPFC.P.Value<.05]
 
 ## load WGCNA results
-# load('result_0703/WGCNA_CM_dl.RData'); names(all)[1] <- "Genename" ##Change "Geneid" to "Genename";
-load('result_0703/WGCNA_CP_dl.RData')
+# load('../results/WGCNA_CM_dl.RData'); names(all)[1] <- "Genename" ##Change "Geneid" to "Genename";
+load('../results/WGCNA_CP_dl.RData')
 
 colnames(moduleTraitPvalue)[1] <- "ptsd"
 
@@ -117,8 +117,8 @@ colors <- matrix(c('brown1', 'white', 'brown4',               # Color for 4
                  ncol= 3, byrow = T) 
 
 
-# pdf('result_0128/kda/KDA_CM_dl_new1.pdf')
-pdf('result_0128/kda/KDA_CP_dl_new1.pdf')
+# pdf('../results/kda/KDA_CM_dl_new1.pdf')
+pdf('../results/kda/KDA_CP_dl_new1.pdf')
 for(m in modules){ ## CM/CP_all
   DEm <- minfo[which(minfo$module == m & minfo[, paste0('PTSD.', group)]), 'Genename', drop=F] ## gene names
   datExpr <- join(minfo[minfo$module == m & !is.na(minfo[, paste0('PTSD.', group)]), c('Geneid', 'Genename'), drop = F], 

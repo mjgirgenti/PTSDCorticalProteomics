@@ -7,7 +7,7 @@ library(ggplot2)
 
 #### miRNA Clustering dendrogram with trait ####
 rm(list=ls())
-load('rawdata/dat_upmc_mirna_all1.5.RData')
+load('../data/dat_upmc_mirna_all1.5.RData')
 getFKPM <- function(dat, log2=TRUE, minute=1e-3, trim=5, scale=1e6, suffix=TRUE, datLen){
   sel <- (trim+1):dim(dat)[2]
   seldat <- dat[,sel]
@@ -39,7 +39,7 @@ datTraits$Ancestry <- as.numeric(datTraits$Ancestry)
 datTraits$Sex <- as.numeric(datTraits$Sex)
 traitColors = numbers2colors(datTraits, signed = F, colors = );
 # Plot the sample dendrogram and the colors underneath.
-pdf('manuscript/figures_v5/1c_dendro.pdf', width=12, height=4)
+pdf('../results/1c_dendro.pdf', width=12, height=4)
 plotDendroAndColors(sampleTree2, traitColors,
                     groupLabels = names(datTraits),
                     main = "miRNA sample dendrogram and trait heatmap")
@@ -53,7 +53,7 @@ datProbes2 <- datProbes1[sel.mir2,]
 df <- reshape2::melt(cbind(datProbes2[,1],datExpr2))
 df$Sample <- factor(df$Sample, levels=names(datExpr2)[sampleTree2$order])
 names(df) <- c("miRNA",'Sample','Expr')
-pdf('manuscript/figures_v5/1d_heatmap_unf.pdf', width=12, height=4)
+pdf('../results/1d_heatmap_unf.pdf', width=12, height=4)
 ggplot(df, aes(Sample, miRNA, fill= Expr)) + 
   geom_tile(colour="white", size=.2) +
   scale_fill_gradient2(low = "blue4", high = "red3", mid = "white",# midpoint = 0, limit = c(-4,4), 
@@ -77,9 +77,9 @@ heatmap(as.matrix(datExpr2[-1]), #ColSideColors = datMeta$color[datMeta$Region==
 rm(list=ls())
 ## dlPFC+sgPFC in ggplot
 library(ggplot2)
-load('result_mirna/deseq_A9_m3_upmc_mirna_all1.5.RData')
+load('../results/deseq_A9_m3_upmc_mirna_all1.5.RData')
 sig01$Dx <- "MDD"; sig02$Dx <- "PTSD"; sig.dl <- rbind(sig01, sig02); sig.dl$BA <- 'dlPFC'
-load('result_mirna/deseq_A25_m3_upmc_mirna_map1.5.RData')
+load('../results/deseq_A25_m3_upmc_mirna_map1.5.RData')
 sig01$Dx <- "MDD"; sig02$Dx <- "PTSD"; sig.sg <- rbind(sig01, sig02); sig.sg$BA <- 'sgPFC'
 sig <- rbind(sig.dl, sig.sg)
 sig$dir <- 0
@@ -96,7 +96,7 @@ sig$dir1[sig$log2FoldChange < 0 & sig$pvalue < .05] <- -1
 sig$dir1[sig$dir1==1 & sig$dir==0] <- 0.5
 sig$dir1[sig$dir1==-1 & sig$dir==0] <- -0.5
 sig$dir1 <- factor(sig$dir1, levels=c(0,1,-1,.5,-.5))
-pdf('manuscript/figures_v5/1a_volcano.pdf', width=7, height=8)
+pdf('../results/1a_volcano.pdf', width=7, height=8)
 ggplot(subset(sig,Dx=="PTSD"), aes(x=log2FoldChange, y=-log10(pvalue), label=label)) +
   geom_point(aes(fill=dir1), shape = 21, colour = "black", size = 4) +
   # scale_fill_manual(values = c('grey80','firebrick','steelblue','coral','skyblue')) +
@@ -128,7 +128,7 @@ ggplot(subset(sig,Dx=="PTSD"), aes(x=log2FoldChange, y=-log10(pvalue), label=lab
 
 #### miRNA WGCNA dendrogram ####
 rm(list=ls())
-load('rawdata/dat_upmc_mirna_all1.5.RData')
+load('../data/dat_upmc_mirna_all1.5.RData')
 getFKPM <- function(dat, log2=TRUE, minute=1e-3, trim=5, scale=1e6, suffix=TRUE, datLen){
   sel <- (trim+1):dim(dat)[2]
   seldat <- dat[,sel]
@@ -202,8 +202,8 @@ net <- blockwiseModules(datExpr = dat, power = power,
                         saveTOMs = F, 
                         saveTOMFileBase = "catTOM",
                         verbose = 3)
-# save(net, datExpr2, file="result_mirna/WGCNA_PTSD_dl_sg.RData")
-pdf('manuscript/figures_v5/2a_wgcna_dendrogram_traits.pdf', width=8, height=5)
+# save(net, datExpr2, file="../results/WGCNA_PTSD_dl_sg.RData")
+pdf('../results/2a_wgcna_dendrogram_traits.pdf', width=8, height=5)
 datTraits <- datMeta[c('PrimaryDx','region','Sex','AgeDeath','Race','RIN','PMI')]
 names(datTraits)[c(2,5)] <- c("Brain region","Ancestry")
 datTraits$PrimaryDx <- as.numeric(datTraits$PrimaryDx)
@@ -243,10 +243,10 @@ library(stringr)
 # options(stringsAsFactors = FALSE, digits = 3)
 # theme_update(plot.title = element_text(hjust = 0.5))
 rm(list=ls())
-load('result_2022/WGCNA_CP_ds_combatBatch.RData')
+load('../results/WGCNA_CP_ds_combatBatch.RData')
 
 ## dendrogram
-# pdf('result_0703//wgcna_dendrogram_amp_ca.pdf', width=12)
+# pdf('../results//wgcna_dendrogram_amp_ca.pdf', width=12)
 # plotDendroAndColors(net$dendrograms[[1]], net$colors[net$blockGenes[[1]]],
 #                     main = "Single block gene dendrogram and module colors",
 #                     dendroLabels = FALSE, hang = 0.03,
@@ -271,7 +271,7 @@ moduleTraitPvalue = corPvalueStudent(moduleTraitCor, nSamples);
 textMatrix = paste(signif(moduleTraitCor, 2), "\n(",
                    signif(moduleTraitPvalue, 1), ")", sep = "");
 dim(textMatrix) = dim(moduleTraitCor)
-pdf('manuscript/figures_v5/2_wgcna_traitcor_ds_cp.pdf', width=8, height=4)
+pdf('../results/2_wgcna_traitcor_ds_cp.pdf', width=8, height=4)
 par(mar = c(5, 5, 3, 3));
 labeledHeatmap(Matrix = moduleTraitCor,
                xLabels = names(datMeta1),
@@ -290,7 +290,7 @@ dev.off()
 
 
 #### miRNA module membership vs GS ####
-load('result_2022/WGCNA_CP_ds_combatBatch.RData')
+load('../results/WGCNA_CP_ds_combatBatch.RData')
 plot(data=subset(all,module==1), trait.GS.PTSD~DxmoduleMembership)
 lm_eqn <- function(df){
   m <- lm(y ~ x, df);
@@ -303,7 +303,7 @@ lm_eqn <- function(df){
 all1 <- subset(all, module==1)
 names(all1)[c(9,12)] <- c("y","x")
 library(ggpmisc)
-pdf('manuscript/figures_v5/2c_regression.pdf', height=5, width=8)
+pdf('../results/2c_regression.pdf', height=5, width=8)
 ggplot(all1, aes(x=x,y=y)) +
   geom_point(pch=16, size=3) + xlab('Module Membership') + ylab('PTSD correlation')+
   geom_smooth(method='lm',formula=y~x) +
@@ -319,8 +319,8 @@ dev.off()
 rm(list=ls())
 library(ggplot2)
 library(ggrepel)
-load('result_mirna/deseq_A9_m3_upmc_mirna_all1.5.RData')
-load('result_2022/WGCNA_CP_ds_combatBatch.RData')
+load('../results/deseq_A9_m3_upmc_mirna_all1.5.RData')
+load('../results/WGCNA_CP_ds_combatBatch.RData')
 mod <- "turquoise"
 alpha_fc = log(1.5)/log(2)
 # de_mod <- de_sp[de_sp$mod.CP==mod,]
@@ -335,7 +335,7 @@ de_mod$dir[de_mod$log2FoldChange<0 & de_mod$pvalue<.05] <- -1
 de_mod$dir[de_mod$log2FoldChange>0 & de_mod$log2FoldChange<alpha_fc & de_mod$pvalue<.05] <- .5
 de_mod$dir[de_mod$log2FoldChange<0 & de_mod$log2FoldChange>-alpha_fc & de_mod$pvalue<.05] <- -.5
 de_mod$dir <- factor(de_mod$dir, levels=c(0,1,-1,.5,-.5))
-pdf('manuscript/figures_v5/2d_volcano1.pdf', height=5)
+pdf('../results/2d_volcano1.pdf', height=5)
 # ggplot(de_mod, aes(x=log2FoldChange,y=-log10(pvalue),fill=dir)) +
 #   # geom_point(alpha=.3+0.7*(de_mod$pvalue<.05)) +
 #   geom_point(shape = 21, colour = "black", size = 4) +
@@ -361,10 +361,10 @@ dev.off()
 #### protein PTSD DEP volcano & venn ####
 library(ggVennDiagram)
 rm(list=ls())
-# dep.dl <- read.csv('result_0518/DE_MDD_PTSD_dl.csv')
-# dep.sg <- read.csv('result_0518/DE_MDD_PTSD_sg.csv')
-dep.dl <- read.csv('result_0518/DE_MDD_PTSD_dl_incA_new1.csv')
-dep.sg <- read.csv('result_0518/DE_MDD_PTSD_sg_incA_new1.csv')
+# dep.dl <- read.csv('../results/DE_MDD_PTSD_dl.csv')
+# dep.sg <- read.csv('../results/DE_MDD_PTSD_sg.csv')
+dep.dl <- read.csv('../results/DE_MDD_PTSD_dl_incA_new1.csv')
+dep.sg <- read.csv('../results/DE_MDD_PTSD_sg_incA_new1.csv')
 dep <- merge(dep.dl, dep.sg, by="EN")
 names(dep) <- names(dep) %>% gsub('x','dl',.) %>% gsub('y','sg',.)
 # x <- list(`PTSD dlPFC`=dep$EN[dep$PTSD.P.Value.dl<.05],
@@ -373,7 +373,7 @@ names(dep) <- names(dep) %>% gsub('x','dl',.) %>% gsub('y','sg',.)
 #           `MDD sgPFC`=dep$EN[dep$MDD.P.Value.sg<.05])
 x <- list(`PTSD dlPFC`=dep$EN[dep$PTSD.P.Value.dl<.05],
           `PTSD sgPFC`=dep$EN[dep$PTSD.P.Value.sg<.05])
-pdf('manuscript/figures_v5/3b_vennProtein.pdf', width=6, height=3)
+pdf('../results/3b_vennProtein.pdf', width=6, height=3)
 ggVennDiagram(x, show_intersect = F, label_alpha = 0) +
   # scale_fill_gradient(low = "#F4FAFE", high = "#4981BF")
   scale_fill_gradient(low = "grey80", high = "coral3")
@@ -385,16 +385,16 @@ names(c3) <- c("PTSD dlPFC","PTSD sgPFC")
 c3 <- (c3<.05)
 library(limma)
 a <- vennCounts(c3)
-pdf('manuscript/figures_v5/3b_vennProtein.pdf')
+pdf('../results/3b_vennProtein.pdf')
 vennDiagram(a, circle.col = 2:3)
 dev.off()
 
 library(ggplot2)
 rm(list=ls())
-# sig01 <- read.csv('result_0518/DE_MDD_PTSD_dl.csv')
-# sig02 <- read.csv('result_0518/DE_MDD_PTSD_sg.csv')
-sig01 <- read.csv('result_0518/DE_MDD_PTSD_dl_incA_new1.csv')
-sig02 <- read.csv('result_0518/DE_MDD_PTSD_sg_incA_new1.csv')
+# sig01 <- read.csv('../results/DE_MDD_PTSD_dl.csv')
+# sig02 <- read.csv('../results/DE_MDD_PTSD_sg.csv')
+sig01 <- read.csv('../results/DE_MDD_PTSD_dl_incA_new1.csv')
+sig02 <- read.csv('../results/DE_MDD_PTSD_sg_incA_new1.csv')
 sig01$BA <- "dlPFC"; sig02$BA <- "sgPFC"
 names(sig01) <- names(sig01) %>% gsub("MDD.|PTSD.","",.)
 names(sig02) <- names(sig02) %>% gsub("MDD.|PTSD.","",.)
@@ -413,7 +413,7 @@ sig$dir1[sig$logFC < 0 & sig$P.Value < .05] <- -1
 sig$dir1[sig$dir1==1 & sig$dir==0] <- 0.5
 sig$dir1[sig$dir1==-1 & sig$dir==0] <- -0.5
 sig$dir1 <- factor(sig$dir1, levels=c(0,1,-1,.5,-.5))
-pdf('manuscript/figures_v5/3a_volcano.pdf', width=5, height=6)
+pdf('../results/3a_volcano.pdf', width=5, height=6)
 ggplot(subset(sig,Dx=="PTSD"), aes(x=logFC, y=-log10(P.Value), label=label)) +
   geom_point(aes(fill=dir1), shape = 21, colour = "black", size = 4) +
   # scale_color_manual(values = c('grey','firebrick','steelblue','coral','turquoise')) +
@@ -434,12 +434,12 @@ dev.off()
 #### protein coverage of transcript types ####
 #### miRNA enrichment of DEPs, PTSD ####
 rm(list=ls())
-df.p <- read.csv('result_mirna/pair_dlpfc_ptsd_share_511_enrichment_new1.csv'); df.p$Dx <- "PTSD"
+df.p <- read.csv('../results/pair_dlpfc_ptsd_share_511_enrichment_new1.csv'); df.p$Dx <- "PTSD"
 df.p$miRNA <- df.p$miRNA %>% tolower %>% gsub('mir','hsa-miR-',.) ## NOMENCLATURE
 df.p$miRNA <- factor(df.p$miRNA, levels=df.p$miRNA[order(df.p$p.chisq)] %>% rev)
 df.p <- subset(df.p, miRNA!="")
 df.p <- subset(df.p, miRNA %in% df.p$miRNA[df.p$p.chisq<.05])
-pdf('manuscript/figures_v5/3d1_enrichment_dl1.pdf', width=5, height=4)
+pdf('../results/3d1_enrichment_dl1.pdf', width=5, height=4)
 ggplot(df.p, aes(miRNA, -log10(p.chisq)*p.sign)) +
   geom_bar(stat="identity", position="dodge", color="black", fill="grey80", width = .6) +
   geom_hline(yintercept=c(-log10(0.05)), color="grey60", linetype="dashed") +
@@ -453,8 +453,8 @@ dev.off()
 # df.p$BA <- "dlPFC"
 # df.p1 <- df.p
 
-pdf('manuscript/figures_v5/3d2_enrichment_sg1.pdf', width=5, height=1.6)
-df.p <- read.csv('result_mirna/pair_sgpfc_ptsd_share_511_enrichment_new1.csv'); df.p$Dx <- "PTSD"
+pdf('../results/3d2_enrichment_sg1.pdf', width=5, height=1.6)
+df.p <- read.csv('../results/pair_sgpfc_ptsd_share_511_enrichment_new1.csv'); df.p$Dx <- "PTSD"
 df.p$miRNA <- df.p$miRNA %>% tolower %>% gsub('mir','hsa-miR-',.) ## NOMENCLATURE
 df.p$miRNA <- factor(df.p$miRNA, levels=df.p$miRNA[order(df.p$p.chisq)] %>% rev)
 df.p <- subset(df.p, miRNA!="")
@@ -477,18 +477,18 @@ dev.off()
 
 #### logFC comparison between mRNA & protein ####
 rm(list=ls())
-# load('result_mirna/pair_dlpfc_CM.RData')
-load('result_mirna/pair_dlpfc_CP.RData')
-load('../transcriptomics_ctx/dat_ulval/deseq_A9_m3_ulval_keep3.RData')
+# load('../results/pair_dlpfc_CM.RData')
+load('../results/pair_dlpfc_CP.RData')
+load('../results/deseq_A9_m3_ulval_keep3.RData')
 # load('dat_upmc/deseq_A9_m3_upmc_keep3.RData')
 # load('dat_lval/deseq_A9_m3_lval_keep3.RData')
-dep <- read.csv('result_200518/DE_MDD_PTSD_dl_incA_new1.csv'); names(dep)[19] <- "Genename"
+dep <- read.csv('../results/DE_MDD_PTSD_dl_incA_new1.csv'); names(dep)[19] <- "Genename"
 dep <- subset(dep, Genename %in% df$Var2)
 degs <- merge(dep, sig01, by="Genename")
 degs <- merge(degs, sig02, by="Genename")
 names(degs) <- names(degs) %>% gsub(".x",".MDD",.) %>% gsub('.y','.PTSD',.)
 
-pdf('manuscript/figures/comparison_mRNA-protein_mdd.pdf', width=6, height=4.5)
+pdf('../results/figures/comparison_mRNA-protein_mdd.pdf', width=6, height=4.5)
 sel <- apply(degs[c('PTSD.P.Value','pvalue.PTSD')], 1, max) < .05 ## both moderately significant
 degs$`P-value` <- apply(degs[c('PTSD.P.Value','pvalue.PTSD')],1,min)
 degs$miRNA="No miRNA associated"; #degs$miRNA[degs$Genename %in% c("CD59", "DPP6")] <- "miRNA associated"
@@ -512,12 +512,12 @@ ggplot(degs[sel,], aes(x=MDD.logFC, y=log2FoldChange.MDD, label=Genename))+#, co
 dev.off()
 
 #### protein module-trait heatmap ####
-# pdf('manuscript/figures/3_moduleTrait.pdf', width=8, height=8)
+# pdf('../results/figures/3_moduleTrait.pdf', width=8, height=8)
 rm(list=ls())
 library(WGCNA)
 library(dplyr)
 ## PTSD, dlPFC
-load('result_0703/WGCNA_CP_dl.RData')
+load('../results/WGCNA_CP_dl.RData')
 nSamples <- dim(datMeta)[1]
 datMeta$PTSD <- as.numeric(datMeta$PrimaryDx=="PTSD")
 datMeta$Ancestry <- datMeta$Race %>% gsub("Asian",0,.) %>% gsub('B',1,.) %>% gsub('W',-1,.) %>% as.numeric
@@ -531,7 +531,7 @@ moduleTraitPvalue = corPvalueStudent(moduleTraitCor, nSamples);
 textMatrix = signif(-log10(moduleTraitPvalue), 2)
 dim(textMatrix) = dim(moduleTraitCor)
 id.grey <- which(names(MEs)=="grey")
-pdf('manuscript/figures_v5/4a_module_trait_CP_dl.pdf')
+pdf('../results/4a_module_trait_CP_dl.pdf')
 par(mar = c(5, 10, 3, 3))
 labeledHeatmap(Matrix = moduleTraitCor[-id.grey,],
                xLabels = names(datMeta1),
@@ -549,7 +549,7 @@ labeledHeatmap(Matrix = moduleTraitCor[-id.grey,],
 dev.off()
 ## MDD, dlPFC
 rm(list=ls())
-load('result_0703/WGCNA_CM_dl.RData')
+load('../results/WGCNA_CM_dl.RData')
 names(MEs) <- names(MEs) %>% gsub('ME','',.)
 nSamples <- dim(datMeta)[1]
 datMeta$MDD <- as.numeric(datMeta$PrimaryDx=="MDD")
@@ -564,7 +564,7 @@ moduleTraitPvalue = corPvalueStudent(moduleTraitCor, nSamples);
 textMatrix = signif(-log10(moduleTraitPvalue), 2)
 dim(textMatrix) = dim(moduleTraitCor)
 id.grey <- which(names(MEs)=="grey")
-# pdf('result_0128/module_trait_CM_dl.pdf')
+# pdf('../results/module_trait_CM_dl.pdf')
 par(mar = c(5, 10, 3, 3))
 labeledHeatmap(Matrix = moduleTraitCor[-id.grey,],
                xLabels = names(datMeta1),
@@ -585,17 +585,17 @@ dev.off()
 rm(list=ls())
 library(ggplot2)
 library(ggrepel)
-# dep <- read.csv('result_0518/DE_MDD_PTSD_dl_incA_new1.csv')
-# load('result_0703/WGCNA_CP_dl.RData')
+# dep <- read.csv('../results/DE_MDD_PTSD_dl_incA_new1.csv')
+# load('../results/WGCNA_CP_dl.RData')
 # dep$mod.CP <- all$module[match(dep$EN, all$Protein)]
-# load('result_0703/WGCNA_CM_dl.RData')
+# load('../results/WGCNA_CM_dl.RData')
 # dep$mod.CM <- all$module[match(dep$EN, all$Protein)]
-# write.csv(dep[-1], file="result_0128/DE_MDD_PTSD_dl_mod_incA_new1.csv", row.names=F)
+# write.csv(dep[-1], file="../results/DE_MDD_PTSD_dl_mod_incA_new1.csv", row.names=F)
 
-pdf('manuscript/figures_v5/4b_volcanoMod2.pdf', height=4, width=4)
+pdf('../results/4b_volcanoMod2.pdf', height=4, width=4)
 load('DIA_new.RData')
-# de_sp <- read.csv('result_0128/DE_MDD_PTSD_dl_mod.csv')
-de_sp <- read.csv('result_0128/DE_MDD_PTSD_dl_mod_incA_new1.csv')
+# de_sp <- read.csv('../results/DE_MDD_PTSD_dl_mod.csv')
+de_sp <- read.csv('../results/DE_MDD_PTSD_dl_mod_incA_new1.csv')
 # de_sp <- de_sp[de_sp$EN %in% datProbes$EN[datProbes$DB=="sp"],]
 
 mod <- "skyblue" ## for PTSD, red/skyblue/tan/royalblue
@@ -671,10 +671,10 @@ dev.off()
 
 #### protein modular eigengene plots: CP-skyblue/red, CM-darkred/grey60/black ####
 rm(list=ls())
-# pdf('result_0128/module_eigengene_dl.pdf')
-# pdf('manuscript/figures/3_eigenprot.pdf', width=4, height=4)
-pdf('manuscript/figures_v5/4b_eigenprot2.pdf', width=4, height=4)
-# load('result_0703/WGCNA_CM_dl.RData')
+# pdf('../results/module_eigengene_dl.pdf')
+# pdf('../results/figures/3_eigenprot.pdf', width=4, height=4)
+pdf('../results/4b_eigenprot2.pdf', width=4, height=4)
+# load('../results/WGCNA_CM_dl.RData')
 # df <- data.frame(PrimaryDx=datMeta$PrimaryDx,Eigengene=MEs$MEgrey60)
 # ggplot(df, aes(x=PrimaryDx, y=Eigengene)) +
 #   geom_boxplot() +
@@ -696,7 +696,7 @@ pdf('manuscript/figures_v5/4b_eigenprot2.pdf', width=4, height=4)
 #   # scale_fill_manual(values=c("grey60","grey80")) +
 #   geom_jitter(aes(color=PrimaryDx), size=4, shape=16, position=position_jitter(0.1)) +
 #   labs(title="MDD module black") + theme_classic()
-load('result_0703/WGCNA_CP_dl.RData')
+load('../results/WGCNA_CP_dl.RData')
 df <- data.frame(PrimaryDx=datMeta$PrimaryDx,Eigengene=MEs$red)
 ggplot(df, aes(x=PrimaryDx, y=Eigengene)) +
   geom_boxplot() +
@@ -730,9 +730,9 @@ dev.off()
 #### protein module-CSEA barplots ####
 rm(list=ls()); dev.off()
 library(reshape2)
-# pdf('result_0128/csea_dl_barplot.pdf')
-pdf('manuscript/figures_v5/4c_csea.pdf', width=8,height=4)
-load('result_0703/WGCNA_CM_dl.RData')
+# pdf('../results/csea_dl_barplot.pdf')
+pdf('../results/4c_csea.pdf', width=8,height=4)
+load('../results/WGCNA_CM_dl.RData')
 to_plot1 <- to_plot[apply(to_plot,1,min)<.05,]
 df <- melt(to_plot)
 df$Enrich <- -log10(df$value)
@@ -747,7 +747,7 @@ ggplot(df, aes(x=Module, y=Enrich, fill=Module)) +
   theme(axis.text.x = element_text(angle = 30, hjust = 1), legend.position="none") +
   facet_grid(Var2~.)
 rm(list=ls())
-load('result_0703/WGCNA_CP_dl.RData')
+load('../results/WGCNA_CP_dl.RData')
 to_plot1 <- to_plot[apply(to_plot,1,min)<.05,]
 df <- melt(to_plot)
 df$Enrich <- -log10(df$value)
@@ -788,7 +788,7 @@ for (i in 1:2){
   if (i==1) df.comb <- df.expr else df.comb <- rbind(df.comb, df.expr) ## following
   }
 ### plot by miRNA
-# pdf('manuscript/figures_v5/4f_targetExpr.pdf', width=7, height=3)
+# pdf('../results/4f_targetExpr.pdf', width=7, height=3)
 # ggplot(subset(df.comb, Dx!="MDD"), aes(Dx, Expr, fill=Protein)) +
 #   geom_boxplot() + xlab(NULL) +
 #   facet_grid(~miRNA) +
@@ -796,7 +796,7 @@ for (i in 1:2){
 # dev.off()
 
 ### plot genewise
-pdf('manuscript/figures_v5/4f_targetExpr2.pdf', width=9, height=5)
+pdf('../results/4f_targetExpr2.pdf', width=9, height=5)
 # ggplot(subset(df.comb, Dx!="MDD"), aes(Dx, Expr, fill=Protein)) +
 #   geom_boxplot() + xlab(NULL) +
 #   geom_jitter(shape=16, position=position_jitter(0.1)) +
@@ -816,13 +816,13 @@ dev.off()
 #### miRNA Venn diagram ####
 library(ggVennDiagram)
 rm(list=ls())
-load('result_mirna/deseq_A9_m3_upmc_mirna_all1.5.RData')
+load('../results/deseq_A9_m3_upmc_mirna_all1.5.RData')
 sig01$Region <- "BA9"; sig01$Dx <- "MDD"
 sig02$Region <- "BA9"; sig02$Dx <- "PTSD"
 sig01.ba9 <- sig01; sig02.ba9 <- sig02
 sig.ba9 <- merge(sig01, sig02[c(2,5:7)], by="Geneid")
 # deg <- sig.ba9
-load('result_mirna/deseq_A25_m3_upmc_mirna_map1.5.RData')
+load('../results/deseq_A25_m3_upmc_mirna_map1.5.RData')
 sig01$Region <- "BA25"; sig01$Dx <- "MDD"
 sig02$Region <- "BA25"; sig02$Dx <- "PTSD"
 sig01.ba25 <- sig01; sig02.ba25 <- sig02
@@ -838,7 +838,7 @@ x <- list(`PTSD dlPFC`=deg$Geneid[deg$pvalue.PTSD.dlPFC<.05] %>% as.character,
 ggVennDiagram(x, show_intersect = F, label_alpha = 0) +
   # scale_fill_gradient(low = "#F4FAFE", high = "#4981BF")
   scale_fill_gradient(low = "grey80", high = "coral3")
-pdf('manuscript/figures_v5/1_venn.pdf', width=6, height=3)
+pdf('../results/1_venn.pdf', width=6, height=3)
 ggVennDiagram(x, show_intersect = F, label_alpha = 0) +
   scale_fill_gradient(low = "grey80", high = "coral3")
 dev.off()
@@ -849,22 +849,22 @@ names(c3) <- c("PTSD dlPFC","PTSD sgPFC")
 c3 <- (c3<.05)
 library(limma)
 a <- vennCounts(c3)
-pdf('manuscript/figures_v5/1b_venn.pdf')
+pdf('../results/1b_venn.pdf')
 vennDiagram(a, circle.col = 2:3)
 dev.off()
 
 #### protein Venn diagram CMP ####
 library(ggVennDiagram)
 rm(list=ls())
-dep.dl <- read.csv('result_0518/DE_MDD_PTSD_dl_incA_new1.csv')
-dep.sg <- read.csv('result_0518/DE_MDD_PTSD_sg_incA_new1.csv')
-dep.dl.pm <- read.csv('result_0518/DE_PvM_dl_incA_new1.csv')
-dep.sg.pm <- read.csv('result_0518/DE_PvM_sg_incA_new1.csv')
+dep.dl <- read.csv('../results/DE_MDD_PTSD_dl_incA_new1.csv')
+dep.sg <- read.csv('../results/DE_MDD_PTSD_sg_incA_new1.csv')
+dep.dl.pm <- read.csv('../results/DE_PvM_dl_incA_new1.csv')
+dep.sg.pm <- read.csv('../results/DE_PvM_sg_incA_new1.csv')
 dep <- merge(dep.dl, dep.dl.pm, by="EN")
 x <- list(`PTSD vs CON`=dep$EN[dep$PTSD.P.Value <.05],
           `MDD vs CON`=dep$EN[dep$MDD.P.Value <.05],
           `PTSD vs MDD`=dep$EN[dep$P.Value<.05])
-pdf('manuscript/supp/venn_cmp.pdf', width=12, height=9)
+pdf('../results/supp/venn_cmp.pdf', width=12, height=9)
 ggVennDiagram(x, show_intersect = F, label_alpha = 0) +
   # scale_fill_gradient(low = "#F4FAFE", high = "#4981BF")
   scale_fill_gradient(low = "grey90", high = "coral2") +
@@ -883,7 +883,7 @@ dev.off()
 #### miRNA Venn diagram CMP ####
 library(ggVennDiagram)
 rm(list=ls())
-load('result_mirna/deseq_A9_m3_upmc_mirna_all1.5.RData')
+load('../results/deseq_A9_m3_upmc_mirna_all1.5.RData')
 sig012 <- merge(sig01, sig02[c(2,5:7)], by="Geneid")
 deg <- merge(sig012, sig12[c(2,5:7)], by="Geneid")
 names(deg) <- names(deg) %>% gsub('.x','.MDD',.) %>% gsub('.y','.PTSD',.)
@@ -896,7 +896,7 @@ gg.dlpfc <- ggVennDiagram(x, show_intersect = F, label_alpha = 0) +
   # scale_fill_gradient(low = "#F4FAFE", high = "#4981BF")
   scale_fill_gradient(low = "grey90", high = "coral2") +
   labs(title='Venn diagram dlPFC')
-load('result_mirna/deseq_A25_m3_upmc_mirna_map1.5.RData')
+load('../results/deseq_A25_m3_upmc_mirna_map1.5.RData')
 sig012 <- merge(sig01, sig02[c(2,5:7)], by="Geneid")
 deg <- merge(sig012, sig12[c(2,5:7)], by="Geneid")
 names(deg) <- names(deg) %>% gsub('.x','.MDD',.) %>% gsub('.y','.PTSD',.)
@@ -909,27 +909,27 @@ gg.sgpfc <- ggVennDiagram(x, show_intersect = F, label_alpha = 0) +
   # scale_fill_gradient(low = "#F4FAFE", high = "#4981BF")
   scale_fill_gradient(low = "grey90", high = "coral2") +
   labs(title='Venn diagram sgPFC')
-pdf('manuscript/figures_v5/5c_venn_cmp_miRNA.pdf', width=8, height=6)
+pdf('../results/5c_venn_cmp_miRNA.pdf', width=8, height=6)
 plot(gg.dlpfc)
 plot(gg.sgpfc)
 dev.off()
 #### protein pathway bubble plot ####
 rm(list=ls())
-# mdd_dl <- xlsx::read.xlsx('result_0128/ipa/ipa_mdd_f2_canonical.xls', sheetIndex=1)
+# mdd_dl <- xlsx::read.xlsx('../results/ipa/ipa_mdd_f2_canonical.xls', sheetIndex=1)
 # names(mdd_dl) <- mdd_dl[1,] %>% as.matrix %>% as.character; mdd_dl <- mdd_dl[-1,]; mdd_dl$Dx <- "MDD"; mdd_dl$Region <- "dlPFC"
-# ptsd_dl <- xlsx::read.xlsx('result_0128/ipa/ipa_ptsd_f2_canonical.xls', sheetIndex=1)
+# ptsd_dl <- xlsx::read.xlsx('../results/ipa/ipa_ptsd_f2_canonical.xls', sheetIndex=1)
 # names(ptsd_dl) <- ptsd_dl[1,] %>% as.matrix %>% as.character; ptsd_dl <- ptsd_dl[-1,]; ptsd_dl$Dx <- "PTSD"; ptsd_dl$Region <- "dlPFC"
-# mdd_sg <- xlsx::read.xlsx('result_0128/ipa/ipa_can_mdd_sgpfc.xls', sheetIndex=1)
+# mdd_sg <- xlsx::read.xlsx('../results/ipa/ipa_can_mdd_sgpfc.xls', sheetIndex=1)
 # names(mdd_sg) <- mdd_sg[1,] %>% as.matrix %>% as.character; mdd_sg <- mdd_sg[-1,]; mdd_sg$Dx <- "MDD"; mdd_sg$Region <- "sgPFC"
-# ptsd_sg <- xlsx::read.xlsx('result_0128/ipa/ipa_can_ptsd_sgpfc.xls', sheetIndex=1)
+# ptsd_sg <- xlsx::read.xlsx('../results/ipa/ipa_can_ptsd_sgpfc.xls', sheetIndex=1)
 # names(ptsd_sg) <- ptsd_sg[1,] %>% as.matrix %>% as.character; ptsd_sg <- ptsd_sg[-1,]; ptsd_sg$Dx <- "PTSD"; ptsd_sg$Region <- "sgPFC"
-mdd_dl <- read.csv('result_210128/ipa/ipa_can_mdd_dl_new1.csv', skip=1)
+mdd_dl <- read.csv('../results/ipa/ipa_can_mdd_dl_new1.csv', skip=1)
 mdd_dl$Dx <- "MDD"; mdd_dl$Region <- "dlPFC"
-ptsd_dl <- read.csv('result_210128/ipa/ipa_can_ptsd_dl_new1.csv', skip=1)
+ptsd_dl <- read.csv('../results/ipa/ipa_can_ptsd_dl_new1.csv', skip=1)
 ptsd_dl$Dx <- "PTSD"; ptsd_dl$Region <- "dlPFC"
-mdd_sg <- read.csv('result_210128/ipa/ipa_can_mdd_sg_new1.csv', skip=1)
+mdd_sg <- read.csv('../results/ipa/ipa_can_mdd_sg_new1.csv', skip=1)
 mdd_sg$Dx <- "MDD"; mdd_sg$Region <- "sgPFC"
-ptsd_sg <- read.csv('result_210128/ipa/ipa_can_ptsd_sg_new1.csv', skip=1)
+ptsd_sg <- read.csv('../results/ipa/ipa_can_ptsd_sg_new1.csv', skip=1)
 ptsd_sg$Dx <- "PTSD"; ptsd_sg$Region <- "sgPFC"
 
 ### bubble plots
@@ -943,7 +943,7 @@ df <- df[df$Ingenuity.Canonical.Pathways %in% shared.path,]
 df <- df[!is.na(df$`z-score`) & df$`z-score`!=0 & df$`mlog(p-value)`>1,]
 df0 <- df
 
-pdf('manuscript/figures/5c_pathways_down.pdf', height=3, width=8.5)
+pdf('../results/figures/5c_pathways_down.pdf', height=3, width=8.5)
 ## UP regulated
 sel.path <- df0$Ingenuity.Canonical.Pathways[df0$Dx=="PTSD" & df0$Region=="dlPFC"][order(df0$`z-score`[df0$Dx=="PTSD"  & df0$Region=="dlPFC"], 
                                                                    decreasing = T)[1:10]]
@@ -959,7 +959,7 @@ ggplot(df, aes(x=Dx, y=Ingenuity.Canonical.Pathways)) +
   facet_grid(.~Region) + theme_bw()
 dev.off()
 
-pdf('manuscript/figures/5c_pathways_up.pdf', height=3, width=8.5)
+pdf('../results/figures/5c_pathways_up.pdf', height=3, width=8.5)
 ## DOWN regulated
 sel.path <- df0$Ingenuity.Canonical.Pathways[df0$Dx=="PTSD"  & df0$Region=="dlPFC"][order(df0$`z-score`[df0$Dx=="PTSD"  & df0$Region=="dlPFC"])[1:10]]
 df <- df0[df0$Ingenuity.Canonical.Pathways %in% sel.path, ]
@@ -987,7 +987,7 @@ getFKPM <- function(dat, log2=TRUE, minute=1e-3, trim=5, suffix=TRUE, lengths=NU
   if(suffix) seldat <- cbind(dat[,1:trim], seldat)
   return(seldat)    
 }
-load('rawdata/dat_upmc_mirna_all1.5.RData') ## dlPFC & sgPFC
+load('../data/dat_upmc_mirna_all1.5.RData') ## dlPFC & sgPFC
 ## normalization on selected miRNAs (option 1)
 sel.sam <- datMeta$region=="dlPFC" ## CHECK POINT 1
 sel.gene <- datProbes$TranscriptType=="miRNA"
@@ -1019,15 +1019,15 @@ df$pvalue <- sapply(colnames(cors), function(g2){
 
 ## combine with protein results
 df$miRNA <- datProbes.t$Genename[match(df$Var1,datProbes.t$Geneid)]
-load('result_mirna/deseq_A9_m3_upmc_mirna_all1.5.RData')
-# load('result_mirna/deseq_A25_m3_upmc_mirna_map1.5.RData')
+load('../results/deseq_A9_m3_upmc_mirna_all1.5.RData')
+# load('../results/deseq_A25_m3_upmc_mirna_map1.5.RData')
 df$PTSD.padj <- sig02$padj[match(df$Var1, sig02$Geneid)]
 df$PTSD.pvalue <- sig02$pvalue[match(df$Var1, sig02$Geneid)]
 df$MDD.padj <- sig01$padj[match(df$Var1, sig01$Geneid)]
 df$MDD.pvalue <- sig01$pvalue[match(df$Var1, sig01$Geneid)]
-# save(df, file="result_mirna/pair_sgpfc_CP_norm.RData")
+# save(df, file="../results/pair_sgpfc_CP_norm.RData")
 
-# load('result_mirna/pair_dlpfc_CP.RData')
+# load('../results/pair_dlpfc_CP.RData')
 ## run the section above
 prot = "VIAAT"; mir = "MIR589"
 # plot(datFPKM.t1[which(datProbes.t$Genename==mir),se[] l.sam],
@@ -1038,7 +1038,7 @@ df.plot <- data.frame(miRNA=datFPKM.t1[which(datProbes.t$Genename==mir),],
                       Dx = datMeta.p$PrimaryDx)
 cor(df.plot$miRNA,df.plot$protein, use = "complete.obs")
 lm(miRNA~protein, data=df.plot) %>% summary
-pdf('manuscript/supplementary/suppfig_10_example2.pdf', width=5, height=5)
+pdf('../results/supplementary/suppfig_10_example2.pdf', width=5, height=5)
 ggplot(df.plot, aes(miRNA, protein, col="black")) +
   geom_point() + xlab('miRNA (log2FPKM)') + ylab('protein (log10LFQ)') + 
   labs(title=paste0("miRNA ", mir, " vs protein ", prot, ", cor=-0.27, R2=0.037")) +
@@ -1048,10 +1048,10 @@ dev.off()
 #### miRNA-protein pairs ####
 rm(list=ls())
 ##MDD
-pairs <- read.csv('manuscript/results/pair_dlpfc_mdd_share_511_enrichment_new1.csv')
+pairs <- read.csv('../results/results/pair_dlpfc_mdd_share_511_enrichment_new1.csv')
 mirna_sig <- pairs$miRNA[pairs$p.chisq<.05]
 modules <- c("darkred","grey60")
-load('result_mirna/pair_dlpfc_CM.RData')
+load('../results/pair_dlpfc_CM.RData')
 df.mod <- subset(df, PTSD.mod %in% modules & miRNA %in% mirna_sig & value < 0 & pvalue < 0.05 & MDD.pvalue < 0.05)
 dim(df.mod)
 load('DIA_new.RData')
@@ -1062,10 +1062,10 @@ df.mod.mdd <- df.mod
 rm(datExpr,datMeta,datProbes,df,df.mod,pairs,mirna_sig,modules)
 
 ##PTSD
-pairs <- read.csv('manuscript/results/pair_dlpfc_ptsd_share_511_enrichment_new1.csv')
+pairs <- read.csv('../results/results/pair_dlpfc_ptsd_share_511_enrichment_new1.csv')
 mirna_sig <- pairs$miRNA[pairs$p.chisq<.05]
 modules <- c("skyblue","red")
-load('result_mirna/pair_dlpfc_CP.RData')
+load('../results/pair_dlpfc_CP.RData')
 df.mod <- subset(df, PTSD.mod %in% modules & miRNA %in% mirna_sig & value < 0 & pvalue < 0.05 & PTSD.pvalue < 0.05)
 dim(df.mod)
 load('DIA_new.RData')
@@ -1076,14 +1076,14 @@ df.mod.ptsd <- df.mod
 rm(datExpr,datMeta,datProbes,df,df.mod,pairs,mirna_sig,modules)
 df.mod <- rbind(df.mod.ptsd, df.mod.mdd)
 df.mod <- df.mod[c(10,8,1,9,2,5,3,4,6,7)]
-write.csv(df.mod, row.names=F, file="manuscript/results/pairs_sig_mirna_protein_2dx2mod.csv")
+write.csv(df.mod, row.names=F, file="../results/results/pairs_sig_mirna_protein_2dx2mod.csv")
 
 ##for mRNA-protein divergent genes
 rm(list=ls())
-pairs <- read.csv('manuscript/results/pair_dlpfc_ptsd_share_511_enrichment_new1.csv')
+pairs <- read.csv('../results/results/pair_dlpfc_ptsd_share_511_enrichment_new1.csv')
 mirna_sig <- pairs$miRNA[pairs$p.chisq<.05]
 genes <- c("RHOB","PTPRE","DPP6","CD59")
-load('result_mirna/pair_dlpfc_CP.RData')
+load('../results/pair_dlpfc_CP.RData')
 df.mod <- subset(df, Var2 %in% genes & value < 0 & pvalue < 0.05)
 dim(df.mod)
 load('DIA_new.RData')
@@ -1091,7 +1091,7 @@ df.mod$Genename <- datProbes$GN[match(df.mod$Var2,datProbes$EN_short)]
 names(df.mod) <- c("Geneid","Protein","Cor","Pvalue.Cor","miRNA","miRNA.Pvalue.MDD","miRNA.Pvalue.PTSD","Module","Genename")
 df.mod$PrimaryDx <- "PTSD"
 df.mod <- df.mod[c(10,8,1,9,2,5,3,4,6,7)]
-write.csv(df.mod, file="manuscript/results/pairs_divergent-proteins.csv", row.names=F)
+write.csv(df.mod, file="../results/results/pairs_divergent-proteins.csv", row.names=F)
 
 
 
@@ -1131,7 +1131,7 @@ fill_color <- df$Color %>% as.character
 #   theme_classic()
 # dev.off()
 library(ggplot2)
-pdf('manuscript/figures/1_RNAtype.pdf', height=5, width=8)
+pdf('../results/figures/1_RNAtype.pdf', height=5, width=8)
 ggplot(df[gene_exp,], aes(x=FPKM, fill=Type)) +
   geom_histogram(color="white",alpha=0.9, position="stack", binwidth = 0.3) +
   scale_fill_discrete(type = c('grey80','grey20','darkred')) + xlab('log2(FPKM)') + ylab('Counts') +
@@ -1160,20 +1160,20 @@ library(RRHO) ## sample code below
 # image(RRHO.example$hypermat)
 
 ### 
-# dep.dl <- read.csv('result_0518/DE_MDD_PTSD_dl.csv')
-# dep.sg <- read.csv('result_0518/DE_MDD_PTSD_sg.csv')
-dep.dl <- read.csv('result_200518/DE_MDD_PTSD_dl_incA_new1.csv')
-dep.sg <- read.csv('result_200518/DE_MDD_PTSD_sg_incA_new1.csv')
+# dep.dl <- read.csv('../results/DE_MDD_PTSD_dl.csv')
+# dep.sg <- read.csv('../results/DE_MDD_PTSD_sg.csv')
+dep.dl <- read.csv('../results/DE_MDD_PTSD_dl_incA_new1.csv')
+dep.sg <- read.csv('../results/DE_MDD_PTSD_sg_incA_new1.csv')
 dep <- merge(dep.dl, dep.sg, by="EN")
 names(dep) <- names(dep) %>% gsub('x','dl',.) %>% gsub('y','sg',.)
-write.csv(dep[-c(2,21)], file="result_200518/DE_MDD_PTSD_dl_sg.csv", row.names=F)
+write.csv(dep[-c(2,21)], file="../results/DE_MDD_PTSD_dl_sg.csv", row.names=F)
 dep$rank.mdd.dl <- rank(dep$MDD.logFC.dl)
 dep$rank.ptsd.dl <- rank(dep$PTSD.logFC.dl)
 dep$rank.mdd.sg <- rank(dep$MDD.logFC.sg)
 dep$rank.ptsd.sg <- rank(dep$PTSD.logFC.sg)
 # dep.sel <- dep[c(1,20,40,41,3,11)]
-# write.table(dep.sel, file="result_0518/DE_rrho_dl.txt", row.names = F, quote=F)
-pdf('manuscript/figures/1_rrho.pdf')
+# write.table(dep.sel, file="../results/DE_rrho_dl.txt", row.names = F, quote=F)
+pdf('../results/figures/1_rrho.pdf')
 RRHO.example <-  RRHO(dep[c(1,40)], dep[c(1,41)], alternative='two.sided')
 image(RRHO.example$hypermat, col=hcl.colors(12, "RdYlBu", rev = T), 
       xlab="MDD dlPFC", ylab="PTSD dlPFC")
@@ -1203,10 +1203,10 @@ library(pSI)
 library(gplots)
 library(ggplot2)
 library(WGCNA)
-# sig <- read.csv('result_0518/DE_MDD_PTSD_dl.csv')
-# sig <- read.csv('result_0518/DE_MDD_PTSD_sg.csv')
-sig <- read.csv('result_0518/DE_MDD_PTSD_dl_incA_new1.csv')
-# sig <- read.csv('result_0518/DE_MDD_PTSD_sg_incA_new1.csv')
+# sig <- read.csv('../results/DE_MDD_PTSD_dl.csv')
+# sig <- read.csv('../results/DE_MDD_PTSD_sg.csv')
+sig <- read.csv('../results/DE_MDD_PTSD_dl_incA_new1.csv')
+# sig <- read.csv('../results/DE_MDD_PTSD_sg_incA_new1.csv')
 load('../data/datProbes.RData')
 sig$Geneid <- datProbes$ensembl_gene_id[match(sig$GN, datProbes$external_gene_id)]
 load('../data/zhang.pSIout.RData')
@@ -1237,22 +1237,22 @@ dendro.col = dendro.col.zhang
 to_plot$pvalue <- rownames(to_plot)
 df <- reshape2::melt(to_plot)
 df$Dx <- "MDD"; df$BA <- "dlPFC"
-write.csv(df, row.names=F, file="result_0128/csea_cm_dl_p05_incA.csv")
+write.csv(df, row.names=F, file="../results/csea_cm_dl_p05_incA.csv")
 
 ## plot
 rm(list=ls())
-# df.cm.sg <- read.csv('result_0128/csea_cm_sg_p05.csv')
-# df.cm.dl <- read.csv('result_0128/csea_cm_dl_p05.csv')
-# df.cp.sg <- read.csv('result_0128/csea_cp_sg_p05.csv')
-# df.cp.dl <- read.csv('result_0128/csea_cp_dl_p05.csv')
-df.cm.sg <- read.csv('result_0128/csea_cm_sg_p05_incA.csv')
-df.cm.dl <- read.csv('result_0128/csea_cm_dl_p05_incA.csv')
-df.cp.sg <- read.csv('result_0128/csea_cp_sg_p05_incA.csv')
-df.cp.dl <- read.csv('result_0128/csea_cp_dl_p05_incA.csv')
+# df.cm.sg <- read.csv('../results/csea_cm_sg_p05.csv')
+# df.cm.dl <- read.csv('../results/csea_cm_dl_p05.csv')
+# df.cp.sg <- read.csv('../results/csea_cp_sg_p05.csv')
+# df.cp.dl <- read.csv('../results/csea_cp_dl_p05.csv')
+df.cm.sg <- read.csv('../results/csea_cm_sg_p05_incA.csv')
+df.cm.dl <- read.csv('../results/csea_cm_dl_p05_incA.csv')
+df.cp.sg <- read.csv('../results/csea_cp_sg_p05_incA.csv')
+df.cp.dl <- read.csv('../results/csea_cp_dl_p05_incA.csv')
 df <- rbind(df.cm.sg, df.cm.dl, df.cp.sg, df.cp.dl)
 df$pvalue <- df$pvalue %>% gsub("value","",.) %>% gsub("<"," < ",.)
 names(df)[1] <- "P-value"
-pdf('manuscript/figures/1_depCSEA.pdf', width=9)
+pdf('../results/figures/1_depCSEA.pdf', width=9)
 ggplot(df[df$`P-value` %in% c("P < 0.05","P < 0.1"),], 
        aes(variable, -log10(value), fill=`P-value`)) + 
   geom_bar(stat="identity", position="dodge", color="black") +
@@ -1280,7 +1280,7 @@ getFKPM <- function(dat, log2=TRUE, minute=1e-3, trim=5, suffix=TRUE, lengths=NU
   if(suffix) seldat <- cbind(dat[,1:trim], seldat)
   return(seldat)    
 }
-load('rawdata/dat_upmc_mirna_all1.5.RData') ## dlPFC & sgPFC
+load('../data/dat_upmc_mirna_all1.5.RData') ## dlPFC & sgPFC
 ## normalization on selected miRNAs (option 1)
 # sel.sam <- datMeta$region=="dlPFC" &## CHECK POINT 1
 sel.sam <- 1:nrow(datMeta)
@@ -1294,11 +1294,11 @@ rownames(datFPKM.t) <- datProbes.t$Geneid
 load('../data/dat_upmc_r.RData')
 shared <- intersect(datProbes.t$Geneid, suff$Geneid)
 id1 <- match(shared, datProbes.t$Geneid); datFPKM.t <- datFPKM.t[id1,]; datProbes.t <- datProbes.t[id1,]
-id2 <- match(shared, suff$Geneid); fpkm.m <- fpkm[id2,[]]; suff.m <- suff[id2,]
+id2 <- match(shared, suff$Geneid); fpkm.m <- fpkm[id2,]; suff.m <- suff[id2,]
 shared.sam <- match(datMeta.t$Sample, meta13r$Sample); fpkm.m <- fpkm.m[,shared.sam]; datMeta.m <- meta13r[shared.sam,]
 df.plot <- data.frame(bulk=rowMeans(fpkm.m), smRNA=rowMeans(datFPKM.t))
 summary(lm(smRNA~bulk, df.plot))
-pdf('manuscript/supp/bulk_vs_smRNA.pdf')
+pdf('../results/supp/bulk_vs_smRNA.pdf')
 ggplot(df.plot, aes(bulk, smRNA)) +
   geom_point() + 
   xlab('mean log2FPKM (bulk RNA-seq)') + ylab('mean log2FPKM (smRNA-seq)') + 
@@ -1314,21 +1314,21 @@ dev.off()
 
 #### enrichment: DE miRNA in protein/mRNA module ####
 rm(list=ls())
-# load('result_mirna/pair_dlpfc_CP.RData') ## CP dlPFC
-# load('result_mirna/pair_dlpfc_CM.RData') ## CM dlPFC
-load('result_mirna/pair_sgpfc_CP_norm.RData') ## CP sgPFC
-# load('result_mirna/pair_sgpfc_CM_norm.RData') ## CM sgPFC
+# load('../results/pair_dlpfc_CP.RData') ## CP dlPFC
+# load('../results/pair_dlpfc_CM.RData') ## CM dlPFC
+load('../results/pair_sgpfc_CP_norm.RData') ## CP sgPFC
+# load('../results/pair_sgpfc_CM_norm.RData') ## CM sgPFC
 ## test module-wise enrichment
 dim(df) ## from pair-wise correlation results
-# load('result_mirna/deseq_A9_m3_upmc_mirna_all1.5.RData') ## BA9
-load('result_mirna/deseq_A25_m3_upmc_mirna_map1.5.RData') ## BA25
+# load('../results/deseq_A9_m3_upmc_mirna_all1.5.RData') ## BA9
+load('../results/deseq_A25_m3_upmc_mirna_map1.5.RData') ## BA25
 df$MDD.pvalue <- sig01$pvalue[match(df$Var1,sig01$Geneid)]
 df$PTSD.pvalue <- sig02$pvalue[match(df$Var1,sig02$Geneid)]
 ## swtich between PTSD and MDD
-# load('result_0703/WGCNA_CP_dl.RData') ## PTSD dlPFC
-# load('result_0703/WGCNA_CM_dl.RData') ## MDD dlPFC
-load('result_0703/WGCNA_CP_sg.RData') ## PTSD sgPFC
-# load('result_0703/WGCNA_CM_sg.RData') ## MDD sgPFC
+# load('../results/WGCNA_CP_dl.RData') ## PTSD dlPFC
+# load('../results/WGCNA_CM_dl.RData') ## MDD dlPFC
+load('../results/WGCNA_CP_sg.RData') ## PTSD sgPFC
+# load('../results/WGCNA_CM_sg.RData') ## MDD sgPFC
 # all <- all[all$Protein %in% datProbes.p$EN,]
 all$Protein <- all$Protein %>% gsub("_HUMAN","",.)
 df$PTSD.mod <- all$module[match(df$Var2,all$Protein)] ## name PTSD.mod doesn't matter
@@ -1380,7 +1380,7 @@ df.p$score[df.p$p.chisq<.001 & df.p$p.sign > 0] <- "***"
 ## plot heatmap
 library(reshape2)
 library(ggplot2)
-pdf('manuscript/supp/enrichment_mirna_module_sg_cp.pdf', width=8, height=3)
+pdf('../results/supp/enrichment_mirna_module_sg_cp.pdf', width=8, height=3)
 ggplot(df.p[df.p$module!="grey",], aes(Genename, module, fill=value)) + 
   geom_tile() +
   geom_text(aes(label = score), vjust = .8) + 
